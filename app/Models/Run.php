@@ -14,42 +14,64 @@ class Run extends Model
         'user_id',
         'distance',
         'duration',
-        'pace',
-        'average_speed',
-        'started_at',
-        'ended_at',
-        'route_data',
-        'elevation_gain',
-        'weather_conditions',
+        'date',
         'notes',
     ];
 
     protected $casts = [
-        'route_data' => 'array',
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
+        'date' => 'datetime',
     ];
 
     /**
      * Get the user that owns the run.
      */
 
-     public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * Calculate pace when accessing the model
+     * Get pace in minutes per mile
      */
     public function getPaceAttribute()
     {
         if (!$this->distance || !$this->duration) {
             return null;
         }
-        // Calculate minutes per mile/km
+        // Calculate minutes per mile
         return $this->duration / 60 / $this->distance;
     }
 
+    /**
+     * Format pace for display (e.g., "8:30 min/mile")
+     */
+    public function getFormattedPaceAttribute()
+    {
+        $pace = $this->pace;
+        if ($pace === null) {
+            return 'N/A';
+        }
 
+        $minutes = floor($pace);
+        $seconds = round(($pace - $minutes) * 60);
+
+        return $minutes . ':' . str_pad($seconds, 2, '0', STR_PAD_LEFT) . ' min/mile';
+    }
+
+    /**
+     * Format duration for display (e.g., "1:30:45")
+     */
+    public function getFormattedDurationAttribute()
+    {
+        $hours = floor($this->duration / 3600);
+        $minutes = floor(($this->duration % 3600) / 60);
+        $seconds = $this->duration % 60;
+
+        if ($hours > 0) {
+            return $hours . ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT) . ':' . str_pad($seconds, 2, '0', STR_PAD_LEFT);
+        }
+
+        return $minutes . ':' . str_pad($seconds, 2, '0', STR_PAD_LEFT);
+    }
 }
