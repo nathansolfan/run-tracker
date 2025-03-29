@@ -31,6 +31,7 @@ class RunController extends Controller
     public function create()
     {
         //
+        return view('runs.create');
     }
 
     /**
@@ -38,7 +39,15 @@ class RunController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+        'distance' => 'required|numeric|min:0.01',
+        'duration' => 'required|string',
+        'date' => 'required|date',
+        'notes' => 'nullable|string',
+        ]);
+
+        // Convert duration input (HH:MM:SS or MM:SS) to seconds
+
     }
 
     /**
