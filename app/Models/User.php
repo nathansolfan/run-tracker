@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use App\Models\Run;
+
+
 
 class User extends Authenticatable
 {
@@ -58,9 +61,9 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    /**
-     * Get the runs for the user.
-     */
+/**
+ * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Run>
+ */
     public function runs() {
         return $this->hasMany(Run::class);
     }
