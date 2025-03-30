@@ -77,9 +77,10 @@ class RunController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Run $run)
     {
-        //
+        $this->authorize('view', $run);
+        return view('runs.show', compact('run'));        
     }
 
     /**
