@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Run;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+
 
 class RunController extends Controller
 {
+    // add this to avoid the red line on authorize()
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -131,6 +138,9 @@ class RunController extends Controller
 
         $run = Auth::user()->runs()->create($validated);
 
+        return redirect()->route('runs.show')->with('success', 'Run updated successfully');
+
+
             
 
 
@@ -139,8 +149,11 @@ class RunController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Run $run)
     {
-        //
+        $this->authorize('delete', $run);
+        $run->delete();
+
+        return redirect()->route('runs.index')->with('success', 'Route deleted with success');
     }
 }
