@@ -47,6 +47,30 @@ class RunController extends Controller
         ]);
 
         // Convert duration input (HH:MM:SS or MM:SS) to seconds
+        $durationParts = array_reverse(explode(':', $request->duration));
+        $seconds = 0;
+
+        // seconds
+        if (isset($durationParts[0])) {
+            $seconds += intval($durationParts[0]);
+        }
+
+        // minutes
+        if (isset($durationParts[1])) {
+            $seconds += intval($durationParts[1] * 60);
+        }
+
+        // hours
+        if (isset($durationParts[2])) {
+            $seconds += intval($durationParts[2] * 3600);
+        }
+
+        $validated['duration'] = $seconds;
+
+        $run = Auth::user()->runs()->create($validated);
+
+        return redirect()->route('runs.index')->with('success', 'Run logged successfully');
+
 
     }
 
