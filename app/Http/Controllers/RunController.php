@@ -95,9 +95,45 @@ class RunController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Run $run)
     {
-        //
+        $this->authorize('update', $run);
+
+        $validated = $request->validate([
+            'distance' => 'required|numeric|min:0.01',
+            'duration' => 'required|string',
+            'date' => 'required|date',
+            'notes' => 'nullable|string',
+            ]);
+
+        // Convert duration input (HH:MM:SS or MM:SS) to seconds
+        $durationParts = array_reverse(explode(':', $request->duration));
+        $seconds = 0;
+
+        // seconds
+        if (isset($durationParts[0])) {
+            $seconds += intval($durationParts[0]);
+        }
+
+        
+
+        // minutes
+        if (isset($durationParts[1])) {
+            $seconds += intval($durationParts[1] * 60);
+        }
+
+        // hours
+        if (isset($durationParts[0])) {
+            $seconds += intval($durationParts[2] * 3600);
+        }
+
+        $validated['duration'] = $seconds;
+
+        $run = Auth::user()->runs()->create($validated);
+
+            
+
+
     }
 
     /**
