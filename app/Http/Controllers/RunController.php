@@ -86,9 +86,10 @@ class RunController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Run $run)
     {
-        //
+        $this->authorize('update', $run);
+        return view('runs.edit', compact('run') );
     }
 
     /**
