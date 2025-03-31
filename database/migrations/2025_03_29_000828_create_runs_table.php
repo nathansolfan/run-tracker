@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('runs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->float('distance', 8,2)->comment('in miles');
+            $table->integer('duration')->comment('in seconds');
+            $table->dateTime('date');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
