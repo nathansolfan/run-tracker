@@ -30,8 +30,6 @@ class RunController extends Controller
 
 
 
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -130,20 +128,17 @@ class RunController extends Controller
         }
 
         // hours
-        if (isset($durationParts[0])) {
+        if (isset($durationParts[2])) {
             $seconds += intval($durationParts[2] * 3600);
         }
 
         $validated['duration'] = $seconds;
 
-        $run = Auth::user()->runs()->create($validated);
+        // UPDATE the existing run instead of creating a new one
+        $run->update($validated);
 
-        return redirect()->route('runs.show')->with('success', 'Run updated successfully');
-
-
-            
-
-
+        // pass ,$run model
+        return redirect()->route('runs.show', $run)->with('success', 'Run updated successfully');      
     }
 
     /**
