@@ -10,13 +10,13 @@
                     <form method="POST" action="{{ route('runs.update', $run) }}">
                         @csrf
                         @method('PUT')
-                        <div class="mb-4">
+                        {{-- <div class="mb-4">
                             <label for="date" class="block font-medium text-sm text-gray-700">{{ __('Date') }}</label>
                             <input id="date" type="date" name="date" value="{{ old('date', $run->date->format('Y-m-d')) }}" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             @error('date')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
-                        </div>
+                        </div> --}}
                         
                         <div class="mb-4">
                             <label for="distance" class="block font-medium text-sm text-gray-700">{{ __('Distance (miles)') }}</label>
