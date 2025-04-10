@@ -1,9 +1,6 @@
-// Import your GPS simulator package
-const { GPSSimulator } = require('sensor-simulator');
-
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize variables
-    let simulator = new GPSSimulator();
+    const simulator = new window.GPSSimulator();
     let simulation = null;
     let removeListener = null;
     let isTracking = false;
@@ -11,6 +8,31 @@ document.addEventListener('DOMContentLoaded', function() {
     let elapsedTime = 0;
     let totalDistance = 0;
     let lastPosition = null;
+    let routeCoordinates = [];
+    
+    // Initialize map
+    const map = L.map('route-map').setView([40.7128, -74.0060], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Route line
+    let routeLine = L.polyline([], {color: 'blue', weight: 4}).addTo(map);
+    
+    // Predefined waypoints - Central Park loop example
+    const waypoints = [
+        {latitude: 40.7812, longitude: -73.9665}, // Northeast corner
+        {latitude: 40.7812, longitude: -73.9815}, // Northwest corner
+        {latitude: 40.7682, longitude: -73.9815}, // Southwest corner
+        {latitude: 40.7682, longitude: -73.9665}  // Southeast corner
+    ];
+    
+    // Add waypoint markers
+    waypoints.forEach((waypoint, index) => {
+        L.marker([waypoint.latitude, waypoint.longitude])
+            .addTo(map)
+            .bindPopup(`Waypoint ${index + 1}`);
+    });
     
     // Cache DOM elements
     const startButton = document.getElementById('start-tracking');
@@ -18,8 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeDisplay = document.getElementById('time-display');
     const distanceDisplay = document.getElementById('distance-display');
     const paceDisplay = document.getElementById('pace-display');
+    const routeTypeSelect = document.getElementById('route-type');
     
-    // Calculate distance between two coordinates using Haversine formula
+    // Calculate distance function (Haversine)
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 3958.8; // Earth's radius in miles
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -40,16 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     
-    // Format pace as MM:SS per mile
-    function formatPace(seconds, miles) {
-        if (miles === 0) return '--:--';
-        
-        const paceSeconds = Math.floor(seconds / miles);
-        const mins = Math.floor(paceSeconds / 60);
-        const secs = paceSeconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-    
     // Update timer display
     function updateTimer() {
         if (isTracking) {
@@ -57,7 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
             timeDisplay.textContent = formatTime(currentTime);
             
             if (totalDistance > 0) {
-                paceDisplay.textContent = formatPace(currentTime, totalDistance);
+                const paceSeconds = Math.floor(currentTime / totalDistance);
+                const paceMinutes = Math.floor(paceSeconds / 60);
+                const paceRemainder = Math.floor(paceSeconds % 60);
+                paceDisplay.textContent = `${paceMinutes}:${paceRemainder.toString().padStart(2, '0')}`;
             }
             
             setTimeout(updateTimer, 1000);
@@ -73,14 +89,57 @@ document.addEventListener('DOMContentLoaded', function() {
         startButton.disabled = true;
         stopButton.disabled = false;
         
-        // Start the simulation from a random location
+        // Reset route data
+        routeCoordinates = [];
+        routeLine.setLatLngs([]);
+        
+        // Get route type
+        const routeType = routeTypeSelect.value;
+        
+        // Pick starting position
+        let startPosition;
+        
+        if (routeType === 'path' && waypoints.length > 0) {
+            // Start at first waypoint
+            startPosition = {
+                latitude: waypoints[0].latitude,
+                longitude: waypoints[0].longitude
+            };
+            
+            // Center map on first waypoint
+            map.setView([startPosition.latitude, startPosition.longitude], 14);
+        } else {
+            // Random start position (New York City)
+            startPosition = {
+                latitude: 40.7128,
+                longitude: -74.0060
+            };
+            
+            // Center map on start position
+            map.setView([startPosition.latitude, startPosition.longitude], 14);
+        }
+        
+        // Start the simulation
         simulation = simulator.simulate(
-            { latitude: 40.7128, longitude: -74.0060 }, // New York City
-            { speed: 3.0, mode: 'random' }
+            startPosition,
+            { 
+                speed: 3.0, 
+                mode: routeType,
+                waypoints: waypoints
+            }
         );
         
         // Listen for position updates
         removeListener = simulator.addListener(position => {
+            // Add position to route
+            const latLng = [position.coords.latitude, position.coords.longitude];
+            routeCoordinates.push(latLng);
+            routeLine.setLatLngs(routeCoordinates);
+            
+            // Pan map to follow current position
+            map.panTo(latLng);
+            
+            // Calculate distance if we have a previous position
             if (lastPosition) {
                 const segmentDistance = calculateDistance(
                     lastPosition.coords.latitude, lastPosition.coords.longitude,
@@ -115,33 +174,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Save the run data
-        saveRunData();
-    });
-    
-    // Save run data to the server
-    function saveRunData() {
         const formData = new FormData();
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         formData.append('distance', totalDistance.toFixed(2));
-        formData.append('duration', formatTime(elapsedTime));
+        
+        // Format duration for the server
+        const hours = Math.floor(elapsedTime / 3600);
+        const minutes = Math.floor((elapsedTime % 3600) / 60);
+        const seconds = elapsedTime % 60;
+        const durationString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        formData.append('duration', durationString);
         formData.append('date', new Date().toISOString().split('T')[0]);
-        formData.append('notes', 'Tracked using simulator');
+        formData.append('notes', routeTypeSelect.value === 'path' ? 'Central Park Loop' : 'Random Route');
+        
+        // Simple route data as JSON
+        formData.append('route_data', JSON.stringify(routeCoordinates));
         
         fetch('/runs', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = '/runs';
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
             } else {
-                alert('Error saving run data');
+                return response.json();
+            }
+        })
+        .then(data => {
+            if (data && data.success) {
+                window.location.href = '/runs';
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error saving run data');
         });
-    }
+    });
 });
