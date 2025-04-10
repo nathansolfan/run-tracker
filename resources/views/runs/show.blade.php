@@ -17,21 +17,21 @@
                         </div>
                     </div>
 
-                    {{-- @if (session('success'))
+                    @if (session('success'))
                         <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
                             {{ session('success') }}
                         </div>
-                    @endif --}}
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            {{-- <div class="bg-gray-100 p-6 rounded-lg">
+                            <div class="bg-gray-100 p-6 rounded-lg">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4">Run Information</h3>
                                 
                                 <div class="mb-4">
                                     <p class="text-sm text-gray-500">Date</p>
                                     <p class="font-medium">{{ $run->date->format('F d, Y') }}</p>
-                                </div> --}}
+                                </div>
 
                                 <div class="mb-4">
                                     <p class="text-sm text-gray-500">Distance</p>
