@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalDistance = 0;
     let lastPosition = null;
     let routeCoordinates = [];
+
+    let useRealGPS = false;
+let watchId = null;
     
     // Initialize map
     const map = L.map('route-map').setView([40.7128, -74.0060], 14);
@@ -41,6 +44,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const distanceDisplay = document.getElementById('distance-display');
     const paceDisplay = document.getElementById('pace-display');
     const routeTypeSelect = document.getElementById('route-type');
+
+    const useRealGPSCheckbox = document.getElementById('use-real-gps');
+
+    // Add a listener for the toggle
+useRealGPSCheckbox.addEventListener('change', function() {
+    useRealGPS = this.checked;
+    
+    // If we're using real GPS, check for permission
+    if (useRealGPS) {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            useRealGPSCheckbox.checked = false;
+            useRealGPS = false;
+        } else {
+            // Test for permission by getting current position
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    // Permission granted, center map on current location
+                    const userLocation = [position.coords.latitude, position.coords.longitude];
+                    map.setView(userLocation, 16);
+                    // Add a marker for current position
+                    L.marker(userLocation).addTo(map)
+                        .bindPopup("Your location")
+                        .openPopup();
+                },
+                error => {
+                    // Permission denied or error
+                    alert("Unable to access your location. Using simulation instead.");
+                    useRealGPSCheckbox.checked = false;
+                    useRealGPS = false;
+                }
+            );
+        }
+    }
+});
     
     // Calculate distance function (Haversine)
     function calculateDistance(lat1, lon1, lat2, lon2) {
