@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalDistance = 0;
     let lastPosition = null;
     let routeCoordinates = [];
-
     let useRealGPS = false;
-let watchId = null;
+    let watchId = null;
     
     // Initialize map
     const map = L.map('route-map').setView([40.7128, -74.0060], 14);
@@ -27,7 +26,7 @@ let watchId = null;
         {latitude: 40.7812, longitude: -73.9665}, // Northeast corner
         {latitude: 40.7812, longitude: -73.9815}, // Northwest corner
         {latitude: 40.7682, longitude: -73.9815}, // Southwest corner
-        {latitude: 40.7682, longitude: -73.9665}  // Southeast corner
+        {latitude: 40.7682, longitude: -73.9675}  // Southeast corner
     ];
     
     // Add waypoint markers
@@ -44,41 +43,40 @@ let watchId = null;
     const distanceDisplay = document.getElementById('distance-display');
     const paceDisplay = document.getElementById('pace-display');
     const routeTypeSelect = document.getElementById('route-type');
-
     const useRealGPSCheckbox = document.getElementById('use-real-gps');
 
     // Add a listener for the toggle
-useRealGPSCheckbox.addEventListener('change', function() {
-    useRealGPS = this.checked;
-    
-    // If we're using real GPS, check for permission
-    if (useRealGPS) {
-        if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
-            useRealGPSCheckbox.checked = false;
-            useRealGPS = false;
-        } else {
-            // Test for permission by getting current position
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    // Permission granted, center map on current location
-                    const userLocation = [position.coords.latitude, position.coords.longitude];
-                    map.setView(userLocation, 16);
-                    // Add a marker for current position
-                    L.marker(userLocation).addTo(map)
-                        .bindPopup("Your location")
-                        .openPopup();
-                },
-                error => {
-                    // Permission denied or error
-                    alert("Unable to access your location. Using simulation instead.");
-                    useRealGPSCheckbox.checked = false;
-                    useRealGPS = false;
-                }
-            );
+    useRealGPSCheckbox?.addEventListener('change', function() {
+        useRealGPS = this.checked;
+        
+        // If we're using real GPS, check for permission
+        if (useRealGPS) {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                useRealGPSCheckbox.checked = false;
+                useRealGPS = false;
+            } else {
+                // Test for permission by getting current position
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // Permission granted, center map on current location
+                        const userLocation = [position.coords.latitude, position.coords.longitude];
+                        map.setView(userLocation, 16);
+                        // Add a marker for current position
+                        L.marker(userLocation).addTo(map)
+                            .bindPopup("Your location")
+                            .openPopup();
+                    },
+                    error => {
+                        // Permission denied or error
+                        alert("Unable to access your location. Using simulation instead.");
+                        useRealGPSCheckbox.checked = false;
+                        useRealGPS = false;
+                    }
+                );
+            }
         }
-    }
-});
+    });
     
     // Calculate distance function (Haversine)
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -118,19 +116,8 @@ useRealGPSCheckbox.addEventListener('change', function() {
         }
     }
     
-    // Start tracking button
-    startButton.addEventListener('click', function() {
-        if (isTracking) return;
-        
-        isTracking = true;
-        startTime = Date.now();
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        
-        // Reset route data
-        routeCoordinates = [];
-        routeLine.setLatLngs([]);
-        
+    // Start simulation function
+    function startSimulation() {
         // Get route type
         const routeType = routeTypeSelect.value;
         
@@ -190,6 +177,76 @@ useRealGPSCheckbox.addEventListener('change', function() {
             
             lastPosition = position;
         });
+    }
+    
+    // Start tracking button
+    startButton.addEventListener('click', function() {
+        if (isTracking) return;
+        
+        isTracking = true;
+        startTime = Date.now();
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        
+        // Reset route data
+        routeCoordinates = [];
+        routeLine.setLatLngs([]);
+        
+        if (useRealGPS) {
+            // Use real device GPS
+            watchId = navigator.geolocation.watchPosition(
+                position => {
+                    // Handle real position update
+                    const latLng = [position.coords.latitude, position.coords.longitude];
+                    
+                    // Add position to route
+                    routeCoordinates.push(latLng);
+                    routeLine.setLatLngs(routeCoordinates);
+                    
+                    // Pan map to follow current position
+                    map.panTo(latLng);
+                    
+                    // Calculate distance if we have a previous position
+                    if (lastPosition) {
+                        const segmentDistance = calculateDistance(
+                            lastPosition.coords.latitude, lastPosition.coords.longitude,
+                            position.coords.latitude, position.coords.longitude
+                        );
+                        
+                        totalDistance += segmentDistance;
+                        distanceDisplay.textContent = totalDistance.toFixed(2);
+                    }
+                    
+                    lastPosition = {
+                        coords: {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        }
+                    };
+                },
+                error => {
+                    console.error("Error getting location", error);
+                    
+                    // Fall back to simulation if real GPS fails
+                    if (!simulation) {
+                        alert("GPS tracking error. Falling back to simulation.");
+                        useRealGPS = false;
+                        if (useRealGPSCheckbox) useRealGPSCheckbox.checked = false;
+                        
+                        // Start simulation instead
+                        startSimulation();
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000
+                }
+            );
+        } else {
+            // Use simulation
+            startSimulation();
+        }
         
         updateTimer();
     });
@@ -203,12 +260,17 @@ useRealGPSCheckbox.addEventListener('change', function() {
         startButton.disabled = false;
         stopButton.disabled = true;
         
-        if (simulation) {
+        if (useRealGPS && watchId !== null) {
+            // Stop watching real GPS position
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+        } else if (simulation) {
+            // Stop simulation
             simulation.stop();
-        }
-        
-        if (removeListener) {
-            removeListener();
+            
+            if (removeListener) {
+                removeListener();
+            }
         }
         
         // Save the run data
@@ -224,7 +286,11 @@ useRealGPSCheckbox.addEventListener('change', function() {
         
         formData.append('duration', durationString);
         formData.append('date', new Date().toISOString().split('T')[0]);
-        formData.append('notes', routeTypeSelect.value === 'path' ? 'Central Park Loop' : 'Random Route');
+        
+        // Add notes about the type of tracking used
+        let notes = useRealGPS ? 'Tracked with real GPS' : 
+                   (routeTypeSelect.value === 'path' ? 'Central Park Loop (simulated)' : 'Random Route (simulated)');
+        formData.append('notes', notes);
         
         // Simple route data as JSON
         formData.append('route_data', JSON.stringify(routeCoordinates));
