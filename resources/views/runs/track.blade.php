@@ -53,10 +53,10 @@
                         </div>
                     </div>
                     
-                    {{-- <div class="text-center">
+                    <div class="text-center">
                         <p class="text-sm text-gray-500 mb-1">Using GPS simulator for development</p>
                         <a href="{{ route('runs.index') }}" class="text-blue-600 hover:underline">Back to runs</a>
-                    </div> --}}
+                    </div>
                 </div>
             </div>
         </div>
