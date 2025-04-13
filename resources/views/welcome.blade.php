@@ -61,7 +61,7 @@
                                 Read the
                                 <a href="https://laravel.com/docs" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
                                     <span>Documentation</span>
-                                    <svg
+                                    {{-- <svg
                                         width="10"
                                         height="11"
                                         viewBox="0 0 10 11"
@@ -74,7 +74,7 @@
                                             stroke="currentColor"
                                             stroke-linecap="square"
                                         />
-                                    </svg>
+                                    </svg> --}}
                                 </a>
                             </span>
                         </li>
