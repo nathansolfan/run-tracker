@@ -20,11 +20,11 @@
                                 <p class="text-sm font-medium text-gray-600">Distance</p>
                                 <p class="text-3xl font-bold"><span id="distance-display">0.00</span> <span class="text-sm">mi</span></p>
                             </div>
-                            {{-- <div class="text-center">
+                            <div class="text-center">
                                 <p class="text-sm font-medium text-gray-600">Pace</p>
                                 <p id="pace-display" class="text-3xl font-bold">--:--</p>
                             </div>
-                        </div> --}}
+                        </div>
                         
                         <div class="flex justify-center">
                             <button id="start-tracking" class="px-6 py-2 bg-green-600 text-white rounded-md mr-3">Start Run</button>
