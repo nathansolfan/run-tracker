@@ -21,13 +21,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Route line
     let routeLine = L.polyline([], {color: 'blue', weight: 4}).addTo(map);
     
-    // Define waypoints for simulation only, but don't display markers
+    // Predefined waypoints - Central Park loop example
     const waypoints = [
-        {latitude: 40.7812, longitude: -73.9665},
-        {latitude: 40.7812, longitude: -73.9815},
-        {latitude: 40.7682, longitude: -73.9815},
-        {latitude: 40.7682, longitude: -73.9675}
+        {latitude: 40.7812, longitude: -73.9665}, // Northeast corner
+        {latitude: 40.7812, longitude: -73.9815}, // Northwest corner
+        {latitude: 40.7682, longitude: -73.9815}, // Southwest corner
+        {latitude: 40.7682, longitude: -73.9675}  // Southeast corner
     ];
+    
+    // Add waypoint markers
+    waypoints.forEach((waypoint, index) => {
+        L.marker([waypoint.latitude, waypoint.longitude])
+            .addTo(map)
+            .bindPopup(`Waypoint ${index + 1}`);
+    });
     
     // Cache DOM elements
     const startButton = document.getElementById('start-tracking');
@@ -55,6 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Permission granted, center map on current location
                         const userLocation = [position.coords.latitude, position.coords.longitude];
                         map.setView(userLocation, 16);
+                        // Add a marker for current position
+                        L.marker(userLocation).addTo(map)
+                            .bindPopup("Your location")
+                            .openPopup();
                     },
                     error => {
                         // Permission denied or error
