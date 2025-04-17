@@ -11,7 +11,7 @@
                     </h2>
                     
                     <div class="bg-gray-100 p-6 rounded-lg mb-6">
-                        <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             <div class="text-center">
                                 <p class="text-sm font-medium text-gray-600">Time</p>
                                 <p id="time-display" class="text-3xl font-bold">00:00:00</p>
