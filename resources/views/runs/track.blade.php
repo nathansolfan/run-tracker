@@ -63,6 +63,6 @@
     </div>
     
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script src="{{ asset('js/gps-simulator.js') }}"></script>
-    <script src="{{ asset('js/run-tracker.js') }}"></script>
+    {{-- <script src="{{ asset('js/gps-simulator.js') }}"></script>
+    <script src="{{ asset('js/run-tracker.js') }}"></script> --}}
 </x-layouts.app>
