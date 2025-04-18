@@ -14,8 +14,8 @@ class RunSeeder extends Seeder
      */
     public function run(): void
     {
-        // create the first test user if noone exist
-        $user = User::first() ?? User::factory()->create([
+        // Create runs for the first user in the database (or create one if none exists)
+        $testUser = User::first() ?? User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
@@ -23,7 +23,19 @@ class RunSeeder extends Seeder
         // create 15 runs for the user
         Run::factory()
         ->count(15)
-        ->for($user)
+        ->for($testUser)
         ->create();
+
+        // Additionally, create runs for a specific user by email (your account)
+        $myUser = User::where('email','your.email@example.com')->first();
+
+        // only create runs if this user exist
+        if ($myUser) {
+            Run::factory()
+            ->count(15)
+            ->for($myUser)
+            ->create();
+        }
+
     }
 }
