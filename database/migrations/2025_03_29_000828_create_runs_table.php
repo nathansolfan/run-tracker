@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('duration')->comment('in seconds');
             $table->dateTime('date');
             $table->text('notes')->nullable();
+            $table->json('route_data')->nullable(); 
             $table->timestamps();
         });
     }
