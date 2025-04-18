@@ -19,5 +19,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Call the RunSeeder to create runs
+        $this->call([
+            RunSeeder::class,
+        ]);
     }
 }
