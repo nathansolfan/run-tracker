@@ -16,10 +16,14 @@ class Run extends Model
         'duration',
         'date',
         'notes',
+        'route_data'
+
     ];
 
     protected $casts = [
         'date' => 'datetime',
+        'route_data' => 'array', // Add this line to cast the field
+
     ];
 
     /**
