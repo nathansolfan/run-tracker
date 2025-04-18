@@ -1,3 +1,5 @@
+console.log('Run Tracker module loaded');
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize variables
     const simulator = new window.GPSSimulator();

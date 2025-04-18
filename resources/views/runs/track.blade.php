@@ -65,4 +65,31 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <script src="{{ asset('js/gps-simulator.js') }}"></script>
     <script src="{{ asset('js/run-tracker.js') }}"></script> --}}
+    
+    <!-- Add this debugging script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            // Check if the map div exists
+            const mapElement = document.getElementById('route-map');
+            console.log('Map element exists:', !!mapElement);
+            
+            // Check if Leaflet is loaded
+            console.log('Leaflet loaded:', typeof L !== 'undefined');
+            
+            // Try to initialize a basic map
+            if (typeof L !== 'undefined' && mapElement) {
+                try {
+                    const debugMap = L.map('route-map').setView([40.7128, -74.0060], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(debugMap);
+                    console.log('Debug map initialized successfully');
+                } catch (e) {
+                    console.error('Error initializing map:', e);
+                }
+            }
+        });
+    </script>
 </x-layouts.app>

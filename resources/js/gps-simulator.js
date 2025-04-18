@@ -1,3 +1,6 @@
+console.log('GPS Simulator module loaded');
+
+
 /**
  * GPS simulator for testing location-based applications
  */
