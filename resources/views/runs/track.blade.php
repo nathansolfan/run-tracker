@@ -65,7 +65,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <script src="{{ asset('js/gps-simulator.js') }}"></script>
     <script src="{{ asset('js/run-tracker.js') }}"></script> --}}
-    
+{{--     
     <!-- Add this debugging script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -91,5 +91,5 @@
                 }
             }
         });
-    </script>
+    </script> --}}
 </x-layouts.app>
