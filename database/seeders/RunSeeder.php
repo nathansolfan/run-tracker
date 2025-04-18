@@ -27,7 +27,7 @@ class RunSeeder extends Seeder
         ->create();
 
         // Additionally, create runs for a specific user by email (your account)
-        $myUser = User::where('email','your.email@example.com')->first();
+        $myUser = User::where('email','max@gmail.com')->first();
 
         // only create runs if this user exist
         if ($myUser) {

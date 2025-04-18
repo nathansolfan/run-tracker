@@ -29,7 +29,7 @@ class RunFactory extends Factory
         $pointCount = $this->faker->numberBetween(20,50);
 
         $startLat = $this->faker->latitude($centerLat - $latRange, $centerLat + $latRange);
-        $startLng = $this->faker->longitude($centerLng - $lngRange, $centerLat = $lngRange);
+        $startLng = $this->faker->longitude($centerLng - $lngRange, $centerLat + $lngRange);
 
         for ($i=0; $i < $pointCount ; $i++) { 
             // each new point is slightly offsent from previous one
