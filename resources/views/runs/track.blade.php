@@ -75,8 +75,8 @@
             const mapElement = document.getElementById('route-map');
             console.log('Map element exists:', !!mapElement);
             
-            {{-- // Check if Leaflet is loaded
-            console.log('Leaflet loaded:', typeof L !== 'undefined'); --}}
+            // Check if Leaflet is loaded
+            console.log('Leaflet loaded:', typeof L !== 'undefined');
             
             // Try to initialize a basic map
             if (typeof L !== 'undefined' && mapElement) {
