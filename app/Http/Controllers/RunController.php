@@ -44,6 +44,15 @@ class RunController extends Controller
      */
     public function store(Request $request)
     {
+
+        // For debugging
+        \Log::info("Run data received", [
+            'has_route_data' => $request->has('route_data'),
+            'route_data_length' => $request->has('route_data') ? strlen($request->route_data) : 0
+        ]);
+
+
+
         $validated = $request->validate([
         'distance' => 'required|numeric|min:0.01',
         'duration' => 'required|string',
@@ -72,7 +81,24 @@ class RunController extends Controller
 
         $validated['duration'] = $seconds;
 
+
+        // Process route_data if present
+        if (!empty($validated['route_data'])) {
+            try {
+                //this validation will ensure its valid JSON
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \Log::error('Invalid JSON in route_data: ' . json_last_error_msg());
+                }
+                // The model will handle the JSON-to-array conversion via the casting
+            } catch (\Exception $e) {
+                \Log::error('Error processing route_data: ' . $e->getMessage());
+            }            
+        }
+
         $run = Auth::user()->runs()->create($validated);
+
+            // Check if request is AJAX/JSON
+
 
         return redirect()->route('runs.index')->with('success', 'Run logged successfully');
 
