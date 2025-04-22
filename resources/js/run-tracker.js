@@ -1,6 +1,12 @@
 console.log('Run Tracker module loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if the map element exists before trying to initialize it
+    const mapElement = document.getElementById('route-map');
+    if (!mapElement) {
+        console.log('Map element not found, skipping map initialization');
+        return; // Exit if the element doesn't exist
+    }
     // Initialize variables
     let isTracking = false;
     let startTime = null;

@@ -23,7 +23,8 @@ class RunController extends Controller
     // Paginates them (10 per page)
     // Displays the runs.index view
 
-    public function index() {
+    public function index()
+    {
         $runs = Auth::user()->runs()->latest('date')->paginate(10);
         return view('runs.index', compact('runs'));
     }
@@ -51,13 +52,13 @@ class RunController extends Controller
             'route_data_length' => $request->has('route_data') ? strlen($request->route_data) : 0
         ]);
 
-
-
         $validated = $request->validate([
-        'distance' => 'required|numeric|min:0.01',
-        'duration' => 'required|string',
-        'date' => 'required|date',
-        'notes' => 'nullable|string',
+            'distance' => 'required|numeric|min:0.01',
+            'duration' => 'required|string',
+            'date' => 'required|date',
+            'notes' => 'nullable|string',
+            'route_data' => 'nullable|string', // Added route_data validation
+
         ]);
 
         // Convert duration input (HH:MM:SS or MM:SS) to seconds
@@ -83,16 +84,8 @@ class RunController extends Controller
 
 
         // Process route_data if present
-        if (!empty($validated['route_data'])) {
-            try {
-                //this validation will ensure its valid JSON
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    \Log::error('Invalid JSON in route_data: ' . json_last_error_msg());
-                }
-                // The model will handle the JSON-to-array conversion via the casting
-            } catch (\Exception $e) {
-                \Log::error('Error processing route_data: ' . $e->getMessage());
-            }            
+        if ($request->has('route_data') && !empty($request->route_data)) {
+            # code...
         }
 
         $run = Auth::user()->runs()->create($validated);
@@ -108,8 +101,6 @@ class RunController extends Controller
 
 
         return redirect()->route('runs.index')->with('success', 'Run logged successfully');
-
-
     }
 
     /**
@@ -118,7 +109,7 @@ class RunController extends Controller
     public function show(Run $run)
     {
         $this->authorize('view', $run);
-        return view('runs.show', compact('run'));        
+        return view('runs.show', compact('run'));
     }
 
     /**
@@ -127,7 +118,7 @@ class RunController extends Controller
     public function edit(Run $run)
     {
         $this->authorize('update', $run);
-        return view('runs.edit', compact('run') );
+        return view('runs.edit', compact('run'));
     }
 
     /**
@@ -142,7 +133,7 @@ class RunController extends Controller
             'duration' => 'required|string',
             'date' => 'required|date',
             'notes' => 'nullable|string',
-            ]);
+        ]);
 
         // Convert duration input (HH:MM:SS or MM:SS) to seconds
         $durationParts = array_reverse(explode(':', $request->duration));
@@ -152,7 +143,7 @@ class RunController extends Controller
         if (isset($durationParts[0])) {
             $seconds += intval($durationParts[0]);
         }
-        
+
 
         // minutes
         if (isset($durationParts[1])) {
@@ -167,22 +158,22 @@ class RunController extends Controller
         $validated['duration'] = $seconds;
 
         // Process route_data if present
-    if (!empty($validated['route_data'])) {
-        try {
-            json_decode($validated['route_data']);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                \Log::error('Invalid JSON in route_data: ' . json_last_error_msg());
+        if (!empty($validated['route_data'])) {
+            try {
+                json_decode($validated['route_data']);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \Log::error('Invalid JSON in route_data: ' . json_last_error_msg());
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error processing route_data: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            \Log::error('Error processing route_data: ' . $e->getMessage());
         }
-    }
 
         // UPDATE the existing run instead of creating a new one
         $run->update($validated);
 
         // pass ,$run model
-        return redirect()->route('runs.show', $run)->with('success', 'Run updated successfully');      
+        return redirect()->route('runs.show', $run)->with('success', 'Run updated successfully');
     }
 
     /**
