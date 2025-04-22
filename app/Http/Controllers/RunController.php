@@ -97,7 +97,14 @@ class RunController extends Controller
 
         $run = Auth::user()->runs()->create($validated);
 
-            // Check if request is AJAX/JSON
+        // Check if request is AJAX/JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Run logged successfully',
+                'redirect' => route('runs.show', $run)
+            ]);
+        }
 
 
         return redirect()->route('runs.index')->with('success', 'Run logged successfully');
@@ -145,7 +152,6 @@ class RunController extends Controller
         if (isset($durationParts[0])) {
             $seconds += intval($durationParts[0]);
         }
-
         
 
         // minutes
@@ -159,6 +165,18 @@ class RunController extends Controller
         }
 
         $validated['duration'] = $seconds;
+
+        // Process route_data if present
+    if (!empty($validated['route_data'])) {
+        try {
+            json_decode($validated['route_data']);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                \Log::error('Invalid JSON in route_data: ' . json_last_error_msg());
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error processing route_data: ' . $e->getMessage());
+        }
+    }
 
         // UPDATE the existing run instead of creating a new one
         $run->update($validated);
