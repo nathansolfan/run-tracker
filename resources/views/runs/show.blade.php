@@ -90,12 +90,26 @@
                         </div>
                     </div>
                     
-                    <!-- Route Map Section -->
+                    <!-- Route Map Section with Debug Info -->
                     @if($run->route_data)
                     <div class="mt-6">
                         <div class="bg-white p-6 rounded-lg shadow">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Run Route</h3>
-                            <div id="route-map" class="h-80 w-full rounded-lg"></div>
+                            <div id="show-run-map" class="h-80 w-full rounded-lg"></div>
+                            
+                            <!-- Debug info (you can remove this in production) -->
+                            <div class="mt-4 p-4 bg-gray-100 rounded text-xs overflow-auto" style="max-height: 100px;">
+                                <p>Data type: {{ gettype($run->route_data) }}</p>
+                                <p>Data count: {{ is_array($run->route_data) ? count($run->route_data) : 'not an array' }}</p>
+                                <p>Data preview: <code>{{ json_encode(array_slice((array)$run->route_data, 0, 3)) }}</code></p>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="mt-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Run Route</h3>
+                            <p class="text-gray-500">No route data available for this run.</p>
                         </div>
                     </div>
                     @endif
@@ -108,41 +122,58 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Script to initialize the map -->
+    <!-- Script to initialize the map with debug -->
     @if($run->route_data)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize map
-            const map = L.map('route-map');
+            console.log('DOM loaded, checking map element');
+            const mapElement = document.getElementById('show-run-map');
+            console.log('Map element exists:', !!mapElement);
             
-            // Add the OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Get route data
-            // const routeData = {!! json_encode($run->route_data) !!};
-            
-            // Create a polyline for the route
-            if (routeData && routeData.length > 0) {
-                const routeLine = L.polyline(routeData, {color: 'blue', weight: 4}).addTo(map);
+            try {
+                // Initialize map with error handling
+                const map = L.map('show-run-map');
+                console.log('Map initialized successfully');
                 
-                // Add markers for start and end points
-                const startPoint = routeData[0];
-                const endPoint = routeData[routeData.length - 1];
+                // Add the OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
                 
-                L.marker(startPoint).addTo(map)
-                    .bindPopup('Start')
-                    .openPopup();
+                // Get route data
+                const routeData = {!! json_encode($run->route_data) !!};
+                console.log('Route data:', routeData);
                 
-                L.marker(endPoint).addTo(map)
-                    .bindPopup('Finish');
-                
-                // Fit the map to the route bounds
-                map.fitBounds(routeLine.getBounds());
-            } else {
-                // If no route data, center on a default location
-                map.setView([40.7128, -74.0060], 13);
+                // Create a polyline for the route
+                if (routeData && routeData.length > 0) {
+                    try {
+                        const routeLine = L.polyline(routeData, {color: 'blue', weight: 4}).addTo(map);
+                        console.log('Route line added');
+                        
+                        // Add markers for start and end points
+                        const startPoint = routeData[0];
+                        const endPoint = routeData[routeData.length - 1];
+                        
+                        L.marker(startPoint).addTo(map)
+                            .bindPopup('Start')
+                            .openPopup();
+                        
+                        L.marker(endPoint).addTo(map)
+                            .bindPopup('Finish');
+                        
+                        // Fit map to the route bounds
+                        map.fitBounds(routeLine.getBounds());
+                        console.log('Map view set to route bounds');
+                    } catch (e) {
+                        console.error('Error creating route line:', e);
+                        map.setView([40.7128, -74.0060], 13);
+                    }
+                } else {
+                    console.log('No route points available, using default view');
+                    map.setView([40.7128, -74.0060], 13);
+                }
+            } catch (e) {
+                console.error('Error initializing map:', e);
             }
         });
     </script>
