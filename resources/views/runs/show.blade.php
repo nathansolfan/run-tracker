@@ -121,7 +121,7 @@
             }).addTo(map);
             
             // Get route data
-            const routeData = {!! json_encode($run->route_data) !!};
+            // const routeData = {!! json_encode($run->route_data) !!};
             
             // Create a polyline for the route
             if (routeData && routeData.length > 0) {
