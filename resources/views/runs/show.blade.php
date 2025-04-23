@@ -141,47 +141,48 @@
                 }).addTo(map);
                 
                 // Get route data
-                const routeData = {!! json_encode($run->route_data) !!};
-                console.log('Route data:', routeData);
-                
-                // If routeData is still a string, try to parse it
-                let parsedRouteData = routeData;
-                if (typeof routeData === 'string') {
+const routeData = {!! json_encode($run->route_data) !!};
+console.log('Route data:', routeData);
+
+// If routeData is still a string, try to parse it
+let parsedRouteData = routeData;
+if (typeof routeData === 'string') {
     try {
         parsedRouteData = JSON.parse(routeData);
+        console.log('Parsed route data:', parsedRouteData);
     } catch (e) {
         console.error('Error parsing route data:', e);
     }
 }
 
-                // Create a polyline for the route
-                if (routeData && routeData.length > 0) {
-                    try {
-                        const routeLine = L.polyline(routeData, {color: 'blue', weight: 4}).addTo(map);
-                        console.log('Route line added');
-                        
-                        // Add markers for start and end points
-                        const startPoint = routeData[0];
-                        const endPoint = routeData[routeData.length - 1];
-                        
-                        L.marker(startPoint).addTo(map)
-                            .bindPopup('Start')
-                            .openPopup();
-                        
-                        L.marker(endPoint).addTo(map)
-                            .bindPopup('Finish');
-                        
-                        // Fit map to the route bounds
-                        map.fitBounds(routeLine.getBounds());
-                        console.log('Map view set to route bounds');
-                    } catch (e) {
-                        console.error('Error creating route line:', e);
-                        map.setView([40.7128, -74.0060], 13);
-                    }
-                } else {
-                    console.log('No route points available, using default view');
-                    map.setView([40.7128, -74.0060], 13);
-                }
+// Create a polyline for the route
+if (parsedRouteData && parsedRouteData.length > 0) {
+    try {
+        const routeLine = L.polyline(parsedRouteData, {color: 'blue', weight: 4}).addTo(map);
+        console.log('Route line added');
+        
+        // Add markers for start and end points
+        const startPoint = parsedRouteData[0];
+        const endPoint = parsedRouteData[parsedRouteData.length - 1];
+        
+        L.marker(startPoint).addTo(map)
+            .bindPopup('Start')
+            .openPopup();
+        
+        L.marker(endPoint).addTo(map)
+            .bindPopup('Finish');
+        
+        // Fit map to the route bounds
+        map.fitBounds(routeLine.getBounds());
+        console.log('Map view set to route bounds');
+    } catch (e) {
+        console.error('Error creating route line:', e);
+        map.setView([40.7128, -74.0060], 13);
+    }
+} else {
+    console.log('No route points available, using default view');
+    map.setView([40.7128, -74.0060], 13);
+}
             } catch (e) {
                 console.error('Error initializing map:', e);
             }
