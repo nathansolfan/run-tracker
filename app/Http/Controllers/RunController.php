@@ -84,16 +84,17 @@ class RunController extends Controller
 
 
         // Process route_data if present
+        // Process route_data if present
         if ($request->has('route_data') && !empty($request->route_data)) {
             try {
-                //this validation will ensure its valid json
+                // First, decode the JSON string
                 $routeData = json_decode($request->route_data, true);
-                
+
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     \Log::error("Invalid JSON in route_data: " . json_last_error_msg());
                 } else {
-                    // include it in the validated date
-                    $validated['route_data'] = $request->route_data;
+                    // Store the decoded array directly (Laravel will JSON-encode it)
+                    $validated['route_data'] = $routeData;
                     \Log::info("Route data processed successfully", [
                         'point_count' => count($routeData)
                     ]);
