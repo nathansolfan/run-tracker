@@ -85,7 +85,22 @@ class RunController extends Controller
 
         // Process route_data if present
         if ($request->has('route_data') && !empty($request->route_data)) {
-            # code...
+            try {
+                //this validation will ensure its valid json
+                $routeData = json_decode($request->route_data, true);
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \Log::error("Invalid JSON in route_data: " . json_last_error_msg());
+                } else {
+                    // include it in the validated date
+                    $validated['route_data'] = $request->route_data;
+                    \Log::info("Route data processed successfully", [
+                        'point_count' => count($routeData)
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error("Error processing route_data " . $e->getMessage());
+            }
         }
 
         $run = Auth::user()->runs()->create($validated);

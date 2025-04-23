@@ -144,6 +144,16 @@
                 const routeData = {!! json_encode($run->route_data) !!};
                 console.log('Route data:', routeData);
                 
+                // If routeData is still a string, try to parse it
+                let parsedRouteData = routeData;
+                if (typeof routeData === 'string') {
+    try {
+        parsedRouteData = JSON.parse(routeData);
+    } catch (e) {
+        console.error('Error parsing route data:', e);
+    }
+}
+
                 // Create a polyline for the route
                 if (routeData && routeData.length > 0) {
                     try {
