@@ -26,10 +26,10 @@
                             </div>
                         </div>
                         
-                        <div class="flex justify-center">
+                        {{-- <div class="flex justify-center">
                             <button id="start-tracking" class="px-6 py-2 bg-green-600 text-white rounded-md mr-3">Start Run</button>
                             <button id="stop-tracking" class="px-6 py-2 bg-red-600 text-white rounded-md" disabled>End Run</button>
-                        </div>
+                        </div> --}}
 
                         <div class="bg-blue-50 p-6 rounded-lg mb-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Route Map</h3>
