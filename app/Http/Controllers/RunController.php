@@ -116,7 +116,7 @@ class RunController extends Controller
         }
 
 
-        return redirect()->route('runs.index')->with('success', 'Run logged successfully');
+        // return redirect()->route('runs.index')->with('success', 'Run logged successfully');
     }
 
     /**
