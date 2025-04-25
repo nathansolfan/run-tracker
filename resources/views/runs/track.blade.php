@@ -36,12 +36,12 @@
                             <div id="route-map" class="h-124 w-full rounded-lg"></div>
                             
                             <div class="mt-4">
-                                {{-- <label class="block font-medium text-sm text-gray-700 mb-2">Route Type</label>
+                                <label class="block font-medium text-sm text-gray-700 mb-2">Route Type</label>
                                 <select id="route-type" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                     <option value="random">Random Movement</option>
                                     <option value="path">Follow Waypoints</option>
                                 </select>
-                            </div> --}}
+                            </div>
 
                             <div class="mt-4 flex items-center">
                                 <span class="mr-3 text-sm font-medium text-gray-700">Use Real GPS</span>
