@@ -17,12 +17,12 @@
                             @enderror
                         </div>
                         
-                        {{-- <div class="mb-4">
+                        <div class="mb-4">
                             <label for="distance" class="block font-medium text-sm text-gray-700">{{ __('Distance (miles)') }}</label>
                             <input id="distance" type="number" name="distance" value="{{ old('distance') }}" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" step="0.01" min="0.01" required>
                             @error('distance')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror --}}
+                            @enderror
                         </div>
                         
                         <div class="mb-4">
