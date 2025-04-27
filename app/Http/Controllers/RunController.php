@@ -106,13 +106,13 @@ class RunController extends Controller
 
         $run = Auth::user()->runs()->create($validated);
 
-        // Check if request is AJAX/JSON
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Run logged successfully',
-                'redirect' => route('runs.show', $run)
-            ]);
+        // // Check if request is AJAX/JSON
+        // if ($request->ajax() || $request->wantsJson()) {
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => 'Run logged successfully',
+        //         'redirect' => route('runs.show', $run)
+        //     ]);
         }
 
 
