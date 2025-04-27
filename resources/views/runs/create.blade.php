@@ -41,13 +41,13 @@
                             @enderror
                         </div>
                         
-                        {{-- <div class="flex items-center justify-end mt-4">
+                        <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('runs.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 mr-2">
                                 {{ __('Cancel') }}
                             </a>
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 {{ __('Save Run') }}
-                            </button> --}}
+                            </button>
                         </div>
                     </form>
                 </div>
